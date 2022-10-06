@@ -57,8 +57,11 @@ open class HighlightingCollectionView: UnclippedTopCollectionView {
     
     private func configureLogTapGesture() {
         let longTapGesture = UILongPressGestureRecognizer(target: self, action: #selector(didLongTap))
-        longTapGesture.minimumPressDuration = 0.25
+        longTapGesture.minimumPressDuration = 0.1
         collectionView.addGestureRecognizer(longTapGesture)
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTap))
+        collectionView.addGestureRecognizer(tapGesture)
     }
     
     private func configureHighlightView() {
@@ -109,6 +112,23 @@ open class HighlightingCollectionView: UnclippedTopCollectionView {
             
         default: break
         }
+    }
+    
+    @objc private func didTap(_ tapGesture: UITapGestureRecognizer) {
+        let location: CGPoint = tapGesture.location(in: collectionView)
+        
+        if let currentIndexPath = collectionView.indexPathForItem(at: location),
+            let lastHighlightedIndexPath = lastHighlightedIndexPath,
+           lastHighlightedIndexPath == currentIndexPath {
+            defer {
+                self.lastHighlightedIndexPath = nil
+            }
+            collectionView(unhighlightItemAt: lastHighlightedIndexPath)
+            return
+        }
+        
+        handleHighlight(at: location)
+        highlightingDelegate?.didBeginHighlighting()
     }
         
     // MARK: - Highlighting methods
