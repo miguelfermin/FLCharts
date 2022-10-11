@@ -143,7 +143,9 @@ extension FLBarPlotView: UICollectionViewDelegateFlowLayout {
             var cellWidth = collectionView.frame.width / numberOfBars
             
             if barConfig.limitWidth {
-              cellWidth = min(cellWidth, barConfig.width + barConfig.spacing)
+                cellWidth = min(cellWidth, self.cellWidth)
+            } else {
+                cellWidth = self.cellWidth
             }
             
             return CGSize(width: cellWidth, height: collectionView.frame.height)
@@ -151,7 +153,13 @@ extension FLBarPlotView: UICollectionViewDelegateFlowLayout {
     }
     
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
+        if !barConfig.limitWidth {
+            let numberOfBars = CGFloat(chartData.dataEntries.count)
+            var cellWidth = collectionView.frame.width / numberOfBars
+            return abs(cellWidth - self.cellWidth)
+        } else {
+            return 0
+        }
     }
     
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
